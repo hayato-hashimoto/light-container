@@ -1,0 +1,42 @@
+phase 1.
+  parse SPD and make <box>es.
+
++ root
+  + text :title
+  + list
+    + item
+    + item
+    + item
+  + text
+    + paragraph
+    + paragraph
+    + text .footnote
+      + paragraph
+      + paragraph
+
+phase 2.
+  parse SSD and add <box> to <style-props>.
+
+-rule-                     -spec-  -properties-
+text                   (s0: [1]     :flow auto)
+paragraph              (s1: [1]     :flow-class block :expand)
+(.footnote paragraph)  (s2: [11]    :font-size 80%)
+:title                 (s3: [100]   :font-size 200%)
+list                   (s4: [1]     :)
+
++ root
+  + text :title (s0 s3)
+  + list (s4)
+    + item
+    + item
+    + item
+  + text (s0)
+    + paragraph (s1)
+    + paragraph (s1)
+    + text .footnote (s0)
+       + paragraph (s2)
+       + paragraph (s2)
+
+phase 3.
+  make <frame>s.
+

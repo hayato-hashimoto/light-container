@@ -1,0 +1,8 @@
+(:viewport   :background-color #(1 1 1) :background-image "/home/hayato/things/test/bg.png")
+(:wrapper    :flow vertical)
+(:title      :font-size 40  :width "40%" :border-style-bottom solid :border-color-bottom #(0.6 0.6 0.6) :border-style-right solid :border-color-right #(0.5 0.5 0.5) :background-color #(0.8 0.8 0.8) :border-style-top solid :border-color-top #(0.65 0.65 0.65))
+(:isbn       :font-size 14 :color #(0 0.6 0) :border-style-bottom solid :border-color-bottom #(0 0.6 0))
+(.translater :font-weight bold :width "20%" :background-color #(1 0 0 0.3))
+(.chapter    :font-weight bold)
+(:intro      :font-weight normal :background-color #(0.5 0.6 1))
+(all         :width       "30%")
