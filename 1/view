@@ -1,0 +1,6 @@
+#!/usr/bin/gosh
+(load "./viewer.scm")
+(define (main args)
+  (if (or (null? args) (null? (cdr args)))
+    (begin (display "load uri: ") (flush)  (view (read-line)))
+    (view (cadr args))))

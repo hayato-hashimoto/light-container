@@ -1,0 +1,177 @@
+(.popup
+  :font-face "Tahoma"
+  :line-height 1.1
+  :background-color #(0.5 0 0)
+  :position #(170 140)
+  :flow horizontal
+  :color #(1 1 1))
+
+(:bar
+  :background-color #(0.8 0.8 0.8)
+  :border-style-bottom solid
+  :border-color-bottom #(0.5 0.5 0.5)
+  :min-size #(600 0))
+
+(.label
+  :margin-left 10
+  :font-size 10)
+
+(.file
+  :background-color #(1 1 1)
+  :border-style-left solid
+  :border-color-left #(0.4 0.4 1)
+  :font-size 10)
+
+(:viewport
+  :scroll vertical
+  :flow vertical
+  :max-size #(600 +inf.0)
+  :background-color #(0 0 0)
+  :color #(1 1 1)
+)
+(.a
+  :color #(0.4 0.5 0.8))
+(.p
+  :flow horizontal
+  :line-height 1.35
+  :margin-top 12
+  :margin-left 8
+  :margin-right 8
+  :color #(0.6 0.6 0.6)
+)
+
+(.pre
+  :line-height 1.2
+  :margin-left 20
+  :color #(0.8 0.8 0.8))
+
+(.code
+  :font-face "Terminus"
+  :color #(0.8 0.8 0.8))
+
+(.vardef
+  :font-face "Terminus")
+
+(.h1
+  :margin-top 18
+  :flow horizontal
+  :font-size 27
+  :font-weight bold
+  :color #(0.7 0.7 0.8)
+)
+
+(.h2
+  :margin-top 14
+  :color #(0.7 0.7 0.8)
+  :flow horizontal
+  :font-size 21
+  :font-weight bold)
+
+(.h3
+  :color #(0.7 0.7 0.8)
+  :margin-top 15
+  :margin-left 8
+  :flow horizontal
+  :font-size 18
+  :font-weight bold)
+
+(.el
+  :margin-left 24
+  :flow vertical)
+
+(.ul
+  :margin-left 24
+  :flow vertical)
+
+(.dl
+  :margin-left 8
+  :flow vertical)
+
+(.dt
+  :flow horizontal
+  :color #(0.8 0.8 0.8)
+  :background-color #(0.15 0.1 0)
+  :margin-top 6
+  :margin-bottom 6)
+
+(.classdef
+  :color #(1 0.6 0.6))
+
+(.dd
+  :margin-left 16
+  :flow horizontal
+  :color #(0.6 0.6 0.6)
+  :margin-top 6
+  :margin-bottom 6
+  :line-height 1.4)
+
+(.li
+  :margin-top 6
+  :margin-bottom 6
+  :color #(0.6 0.6 0.6)
+  :flow horizontal)
+
+(.em
+  :color #(0.7 0.7 0.7)
+  :font-weight bold)
+
+(.syntax
+  :font-face "Terminus"
+  :margin-left 0
+  :margin-right 0
+  :color #(0.7 0.6 0.4))
+
+(.sc
+  :font-size 12)
+
+(:title
+  :font-size 40
+  :width "40%"
+  :background-color #(0.8 0.8 0.8)
+  :border-style-bottom solid
+  :border-color-bottom #(0.6 0.6 0.6)
+  :border-style-right solid
+  :border-color-right #(0.5 0.5 0.5)
+  :border-style-top solid
+  :border-color-top #(0.65 0.65 0.65)
+  :margin-left 10
+  :margin-top 10
+  :margin-bottom 10
+  :border-style-left solid
+  :border-color-left #(0.7 0.7 0.7))
+
+(.dl
+  :flow vertical
+  :max-size #(+inf.0 700))
+
+(.dt
+  :max-size #(360 +inf.0))
+
+(.dd
+  :max-size #(360 +inf.0))
+
+(:isbn
+  :font-size 14
+  :color #(0 0.6 0)
+  :border-style-bottom solid
+  :border-color-bottom #(0 0.6 0))
+
+(.author
+  :margin-right 100)
+
+(.translater
+  :font-weight bold
+  :width "20%"
+  :background-color #(1 0 0 0.3))
+
+(.chapter
+  :font-weight bold)
+
+(.hover
+  :background-color #(0 0 1 0.3))
+
+(:intro
+  :font-weight normal :background-color #(0.5 0.6 1))
+
+(all
+  :width "30%")
