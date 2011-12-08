@@ -1,0 +1,80 @@
+(.p "G" (.sc "AUCHE") " P" (.sc "ROGRAMMER") "'" (.sc "S") " R" (.sc "EFERENCE") " M" (.sc "ANUAL") " (0.9.2)  》" (.em "  7.6: メタオブジェクトプロトコル")
+ "    [ " (.a "<") " ] [ " (.a "up") " ] [ " (.a " >") " ]") 
+(.popup "a")
+(.wrapper
+(.h1 "7.6 メタオブジェクトプロトコル")
+(.p "CLOS 風のオブジェクトシステムでは、オブジェクトシステムがそれ自身の上に構築されます。すなわち、クラス構造のようなもの、クラスをどのように生成するか、インスタンスをどのように生成し初期化するか、メソッドをどのようにディスパッチし呼び出すか、これらはすべてオブジェクトシステムによって、定義されます。たとえば、クラスはジェネリックな構造と標準的クラスの振舞いを定義する " (.code "<class>") " クラスのインスタンスです。 "(.code "<class>")" をサブクラス化すると、デフォルトのものとは違う振舞いをする、独自のクラス集合をつくることができます。これは結局、独自のオブジェクトシステムをつくることになります。")
+(.p "メタオブジェクトプロトコルは、どのようにオブジェクトシステムを構築するかに関連する API 群の定義です。ブロック構築のクラス、オブジェクトシステムを操作するあいだに呼ばれるジェネリック関数の名前と順序などです。これらのクラスをサブクラス化し、これらのメソッドを特定化することは、オブジェクトシステムの振舞いをカスタマイズすることを意味します。 ")
+(.h2 "7.6.1 クラスのインスタンシエーション")
+(.p "すべてのクラスはある特殊なクラスのグループのインスタンスになっています。他のクラスのクラスになれるようなクラスのことを" (.em "メタクラス") "と呼びます。 Gauche では "(.code "<class>" )" クラスおよびそのサブクラスのみがメタクラスになれます。")
+(.h3 "define-class の展開")
+(.p (.syntax "define-class") " マクロは基本的には "(.code "<class>") " (あるいは指定されたメタクラス) のインスタンスを生成するコードのラッパーで、それを与えられた名前に束縛します。以下のような " (.syntax "define-class") " 形式を前提とします。")
+(.p .pre .code
+"("(.syntax "define-class") " name (supers ...)
+  slot-specs
+  options ...)")
+(.p "これを次のように展開します。 (" (.code "`gauche-config --syslibdir`/gauche/object.scm ") "の define-class マクロの定義をみれば展開形式を見ることができます。)")
+(.p .pre .code "(" (.syntax "define") " name
+  ("(.syntax "let")" ((tmp1 (make metaclass 
+                 :name 'name :supers (list supers)
+                 :slots (map process-slot-definitions
+                             slot-specs)
+                 :defined-modules (list (current-module))
+                 options ...)))
+    ... check class redefinition ...
+    ... registering accessor methods ...
+    tmp1))")
+(.p "生成されるクラスのクラス、つまり、"(.code "metaclass") " は以下のルールで決定されます。")
+(.el
+  (.li "もし、:metaclass オプションが define-class マクロに与えられていれば、その値を使います。その値は、<class> クラスかあるいはその子孫でなければなりません。")
+  (.li "さもなければ、クラス順位リスト中のクラスのメタクラスが試されます。")
+  (.ul
+    (.li "もし、すべてのメタクラスが <class> であるなら、生成されるクラスのメタクラスも <class> になります。")
+    (.li "もし、すべてのメタクラスが <class> かあるいは別のメタクラス A のどちらかであれば、生成されるクラスのメタクラスは、A になります。")
+    (.li "もしメタクラスの集合が <class> 以外の 2つ以上のメタクラス (A, B, C ...)を含む場合、生成されるクラスのメタクラスはこれらのメタクラス A, B, C ... すべてを継承したメタクラスになります。 ")))
+
+(.p "クラスの名前、スーパークラス、スロットの定義は初期化引数としてジェネリック関数 " (.code "make") " に引き渡され、それ以外の引数は " (.syntax "define-class") " に引き渡されます。初期化引数 " (.code "define-modules") " はどのモジュールでそのクラスが定義されたかを覚えておくために引き渡されます。これはこのクラスの再定義のとき用です。")
+
+(.p "スロットの仕様 slot-specs は内部メソッド process-slot-definitions (これは直接呼び出すことはできません)で処理され、スロット定義になります。厳密には、" (.code ":init-form") " スロットオプションは、"(.code ":init-thunk")" オプションになり、"(.code ":getter")"、"(.code ":setter")"、"(.code ":accessor")" のスロットオプションは引用されます。")
+
+(.p "クラス("(.code "metaclass")" のインスタンス)が生成された後、"(.code "name")" のグローバルな束縛がチェックされます。それが、クラスに束縛されていれば、クラスの再定義プロトコルが起動されます("(.a "クラスの再定義")" 参照)。")
+
+(.p "その後、slot-specs 中で、:getter、:setter、 :accessor スロットオプションに与えられたメソッドが集められ、対応するジェネリック関数に登録されます。 ")
+
+(.h3 "クラス構造")
+
+(.p .classdef "Class: <class>")
+
+(.p "すべてのメタクラスのベースクラスである <class> は以下のようなスロットを持っています。これらのスロットは内部的な管理のためにあるのでクラスが初期化された後に、これらの値を変更すべきではないということに注意してください。クラスの情報を得るには、これらのスロットに直接アクセスするのではなく、クラスオブジェクト にある手続きを使うことをおすすめします。")
+
+(.dl .classdesc
+  (.dt .vardef "(slot-ref <class> 'name)")
+  (.dd .vardesc "クラスの名前、define-class マクロに与えられたシンボルです。 class-name はこの値を返します。")
+  (.dt .vardef "(slot-ref <class> 'cpl)")
+  (.dd .vardesc "クラス順位リストです。class-precedence-list はこの値を返します。")
+  (.dt .vardef "(slot-ref <class> 'direct-supers)")
+  (.dd .vardesc "直接スーパークラスのリストです。 class-direct-supers はこの値を返します。")
+  (.dt .vardef "(slot-ref <class> 'accessors)")
+  (.dd .vardesc "スロットアクセサの連想リストです。これは各スロットがどのようにアクセスされるべきかをカプセル化しています。")
+  (.dt .vardef "(slot-ref <class> 'slots)")
+  (.dd .vardesc "スロット定義のリストです。class-slots はこの値を返します。スロット定義についての詳細は、スロット定義オブジェクト を参照してください。")
+  (.dt .vardef "(slot-ref <class> 'direct-slots)")
+  (.dd .vardesc "このクラスの定義で直接指定された(つまり継承したものではない)スロット定義のリストです。class-direct-slots はこの値を返します。")
+  (.dt .vardef "(slot-ref <class> 'num-instance-slots)")
+  (.dd .vardesc "インスタンスにアロケートされるスロットの数です。")
+  (.dt .vardef "(slot-ref <class> 'direct-subclasses)")
+  (.dd .vardesc "このクラスを直接継承しているクラスのリストです。 class-direct-subclasses はこの値を返します。")
+  (.dt .vardef "(slot-ref <class> 'direct-methods)")
+  (.dd .vardesc "このクラスを特定化子リスト中にもつメソッドのリストです。 class-direct-methods はこの値を返します。 ")
+  (.dt .vardef "(slot-ref <class> 'initargs)")
+  (.dd .vardesc "このクラスが生成されるときの初期化引数リストです。この情報は再定義されたクラスを初期化するのに使います(クラスの再定義 参照)。")
+  (.dt .vardef "(slot-ref <class> 'defined-modules)")
+  (.dd .vardesc "このクラスがグローバル束縛をもつモジュールのリストです。")
+  (.dt .vardef "(slot-ref <class> 'redefined)")
+  (.dd .vardesc "このクラスが再定義された場合、このスロットは新しいクラスへの参照を含みます。そうでない場合にはこのスロットは #f をもっています。")
+  (.dt .vardef "(slot-ref <class> 'category)")
+  (.dd .vardesc "このスロットの値は、このクラスがどのように生成されたかを示しています。 Scheme 定義のクラスは、scheme というシンボルを持っています。それ以外の値は内部的に使用するだけです。")) 
+
+(.h3 "<class> 用の make メソッド")
+(.dl .methods
+  (.dt .funcdef "Method: " (.funcspec "(make (class <class>) :rest initargs)"))))
