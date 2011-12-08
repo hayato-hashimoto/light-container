@@ -20,24 +20,23 @@
   (connect SDL-keydown #\f (^e (show-hints (~ window 'current-page 'document) (~ window 'current-page 'document-overlay))))
   (connect SDL-keydown #\space (^e (update! (~ window 'current-page 'scroll-position 1) (^x (min (ceiling (- (~ window 'current-page 'size 1) (~ window 'size 1))) (+ x 240)))) (repaint window)))
   (set! (~ window 'current-page) (make <window>))
-  (set! (~ window 'stylesheet-uri) "preferences/userContent.sst")
-  (set! (~ window 'document-uri) uri)
+  (set! (~ window 'current-page 'stylesheet-uri) "preferences/userContent.sst")
+  (set! (~ window 'current-page 'document-uri) uri)
   (paint window)
   (mainloop))
 
 (define (show-hints doc target)
   (define hint-text-chars "asdfqwer")
-  (define next-text
+  (define (next-text)
     (define i 0)
     (define base (string-length hint-text-chars))
-    (lambda ()
-      (begin0
-        (if (= i 0) "a"
-          (string
-            (unfold i (^i (= i 0)) (^i (values (~ hint-text-chars (floor (/ i base))) (- i (floor (/ i base))))))))
-        (set! i (+ i 1)))))
+    (begin0
+      (if (= i 0) "a"
+        (string
+          (unfold i (^i (= i 0)) (^i (values (~ hint-text-chars (floor (/ i base))) (- i (floor (/ i base))))))))
+      (set! i (+ i 1))))
   (for-each 
     (^x
-      (append-child! target
+      (graphlib: append! target
         (vertice `(.hint :style (:position ,(~ x 'style :position)) ,(next-text)))))
     (query doc .a)))
