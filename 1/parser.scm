@@ -94,34 +94,52 @@
     (else `(,(car lis) ,glue ,@(list-join (cdr lis) glue)))))
     
 (define-method spd-frame-construct ((b <box>))
-  (car (spd-frame-construct-internal b)))
+   (car (%make-frame-for-box b)))
 
-(define-method spd-frame-construct-internal ((b <text-box>))
-  (map (^(text)
-    (let1 frame
-      (if (string=? text "\n")
-        (make <br-frame> :box b :kids '())
-        (make <text-frame> :box b :kids '() :text text))
-      (let1 style (filter-most-specific (~ b 'style-rules))
-        (set! (~ b 'frame) frame)
-        (set! (~ frame 'style) style)
-        (set! (~ frame 'style :line-height) (inherited-style (~ b 'mom) :line-height))
-        (set! (~ frame 'style :font-face) (inherited-style (~ b 'mom) :font-face))
-        (set! (~ frame 'style :font-size) (inherited-style (~ b 'mom) :font-size))
-        (set! (~ frame 'style :font-weight) (inherited-style (~ b 'mom) :font-weight))
-        (set! (~ frame 'style :color) (inherited-style (~ b 'mom) :color)))
-      frame)) (list-join (string-split (~ b 'text) "\n") "\n")))
+(define-method %make-frame-for-box ((b <text-box>))
+  (map
+    (^(text)
+      (let1 frame
+        (if (string=? text "\n")
+          (make <br-frame> :box b :kids '())
+          (make <text-frame> :box b :kids '() :text text))
+        (let1 style (filter-most-specific (~ b 'style-rules))
+          (set! (~ b 'frame) frame)
+          (set! (~ frame 'style) style)
+          (set! (~ frame 'style :line-height) (inherited-style (~ b 'mom) :line-height))
+          (set! (~ frame 'style :font-face)   (inherited-style (~ b 'mom) :font-face))
+          (set! (~ frame 'style :font-size)   (inherited-style (~ b 'mom) :font-size))
+          (set! (~ frame 'style :font-weight) (inherited-style (~ b 'mom) :font-weight))
+          (set! (~ frame 'style :color)       (inherited-style (~ b 'mom) :color)))
+        frame))
+    (list-join (string-split (~ b 'text) "\n") "\n")))
 
-(define-method spd-frame-construct-internal ((b <box>))
-  (list (let1 frame (make <frame> :box b)
-    (set! (~ b 'frame) frame) 
-    (set! (~ frame 'style) (filter-most-specific (~ b 'style-rules)))
-    (for-each (^(property)
-        (when (eq? (~ frame 'style property) 'inherit)
-          (set! (~ frame 'style property) (inherited-style (~ b 'mom) property))))
-      (hash-table-keys (~ frame 'style)))
-    (set! (~ frame 'kids) (apply append (map spd-frame-construct-internal (~ b 'kids))))
-    frame)))
+(define (init-style frame)
+  (let1 b (~ frame 'box)
+    (set! (~ frame 'style)
+      (filter-most-specific
+        (if b (~ b 'style-rules) '())))
+    (for-each
+      (^(prop)
+        (when (eq? (~ frame 'style prop) 'inherit)
+          (set! (~ frame 'style prop)
+            (inherited-style
+              (and b (~ b 'mom))
+              prop))))
+      (hash-table-keys (~ frame 'style)))))
+
+(define-method %make-frame-for-box ((b <box>))
+  (let1 frame (make <frame> :box b)
+    (set! (~ b 'frame) frame)
+    (init-style frame)
+    (set! (~ frame 'kids)
+      (apply append (map %make-frame-for-box (~ b 'kids))))
+    (for-each (lambda (kid)
+        (set! (~ kid 'mom) frame))
+      (~ frame 'kids))
+    (if (~ frame 'style :break-before)
+      (list (let1 x (make <br-frame>) (init-style x) x) frame)
+      (list frame))))
 
 (define (filter-most-specific rules)
   (define table (make-hash-table))
@@ -199,7 +217,9 @@
   :font-slant normal
   :font-size 14
   :font-face "M+ 1p"
-  :shape rectanble))
+  :shape rectanble
+  :break-before #f
+  :page-break-after #f))
 
 (define default-style-properties-no-inheritance (list->hash-table '(
   :font-face "M+ 1p"

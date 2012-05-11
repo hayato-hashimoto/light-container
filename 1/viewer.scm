@@ -17,6 +17,7 @@
   (connect SDL-keydown #\h (^e (update! (~ window 'current-page 'scroll-position 0) (^x (max 0 (+ x -20)))) (repaint window)))
   (connect SDL-keydown #\l (^e (update! (~ window 'current-page 'scroll-position 0) (pa$ + 20)) (repaint window)))
   (connect SDL-keydown #\g (^e (set! (~ window 'current-page 'scroll-position 1) 0) (repaint window)))
+  (connect SDL-keydown #\p (^e (document->pdf window "output.pdf" 600 600)))
   (connect SDL-keydown #\f (^e (show-hints (~ window 'current-page 'document) (~ window 'current-page 'document-overlay))))
   (connect SDL-keydown #\space (^e (update! (~ window 'current-page 'scroll-position 1) (^x (min (ceiling (- (~ window 'current-page 'size 1) (~ window 'size 1))) (+ x 240)))) (repaint window)))
   (set! (~ window 'current-page) (make <window>))

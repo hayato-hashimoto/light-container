@@ -53,7 +53,9 @@
   :font-face "Terminus")
 
 (.h1
+  :break-before #t
   :margin-top 18
+  :margin-bottom 18
   :flow horizontal
   :font-size 27
   :font-weight bold
@@ -61,13 +63,16 @@
 )
 
 (.h2
+  :break-before #t
   :margin-top 14
+  :margin-bottom 14
   :color #(0.7 0.7 0.8)
   :flow horizontal
   :font-size 21
   :font-weight bold)
 
 (.h3
+  :page-break #t
   :color #(0.7 0.7 0.8)
   :margin-top 15
   :margin-left 8

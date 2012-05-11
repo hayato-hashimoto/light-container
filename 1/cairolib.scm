@@ -3,6 +3,7 @@
 
 (c-load "SDL/SDL.h" :libs "-lSDL")
 (c-load "cairo/cairo.h" :libs "-lcairo")
+(c-load "cairo/cairo-pdf.h" :libs "-lcairo")
 
 (set! exit (lambda x (quit)))
 (define sdl-sf '())
